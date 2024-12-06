@@ -11,7 +11,7 @@ const videoController = new VideoController(videoService);
 
 const router = Router();
 
-router.get('/', videoController.getAllVideos.bind(videoController));
+router.get('/ranking', videoController.getAllVideos.bind(videoController));
 router.get('/battle', videoController.getVideosBattle.bind(videoController));
 router.post('/vote', videoController.voteOnVideo.bind(videoController));
 

@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect, useCallback } from "react";
+import axios from 'axios';
+import io from 'socket.io-client';
 
 type VideoRanking = {
   id: string;
@@ -7,34 +8,33 @@ type VideoRanking = {
   rating: number;
 }
 
+const socket = io('http://localhost:5000', {
+  transports: ['websocket']
+});
+
 function RankingPage() {
   const [videos, setVideos] = useState<VideoRanking[]>([]);
-  const [timeRemaining, setTimeRemaining] = useState<number>(5);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      fetchRankings();
-      setTimeRemaining(5);
-    }, 5000);
-
-    const countdown = setInterval(() => {
-      setTimeRemaining((prev) => (prev > 0 ? prev - 1 : 0));
-    }, 1000);
-
-    return () => {
-      clearInterval(interval);
-      clearInterval(countdown);
-    };
-  }, []);
-
-  async function fetchRankings() {
+  const fetchRankings = useCallback(async () => {
     try {
-      const response = (await axios.get<VideoRanking[]>("http://localhost:5000/api/videos")).data;
+      const response = (await axios.get<VideoRanking[]>("http://localhost:5000/api/videos/ranking")).data;
       setVideos(response);
     } catch (error) {
       console.error("Erro ao buscar classificações", error);
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    fetchRankings();
+    
+    socket.on('rankingUpdate', (newVideos: VideoRanking[]) => {
+      setVideos(newVideos);
+    });
+
+    return () => {
+      socket.off('rankingUpdate');
+    };
+  }, []);
 
   return (
     <div>
@@ -42,16 +42,13 @@ function RankingPage() {
       {!videos.length ? (
         <p>Carregando vídeos...</p>
       ) : (
-        <>
-          <p>Próxima atualização em: {timeRemaining} segundo{timeRemaining !== 1 ? 's' : ''}</p>
-          <ul>
-            {videos.map((video) => (
-              <li key={video.id}>
-                {video.title} - Classificação: {video.rating}
-              </li>
-            ))}
-          </ul>
-        </>
+        <ul>
+          {videos.map((video) => (
+            <li key={video.id}>
+              {video.title} - Classificação: {video.rating}
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

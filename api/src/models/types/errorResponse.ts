@@ -1,4 +1,5 @@
 export interface ErrorResponse {
     message: string;
-    status?: number
+    status?: number;
+    stack?: string;
 }

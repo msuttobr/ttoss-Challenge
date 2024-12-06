@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { VideoService } from '../services/videoService';
 import { InVideo } from '../models/inVideo/video';
+import { io } from '../app';
 
 export class VideoController {
   constructor(private videoService: VideoService) { }
@@ -36,6 +37,14 @@ export class VideoController {
 
       await this.videoService.voteOnVideo(inVideo);
 
+      const videosReq: Request = {} as Request;
+      const videosRes: Response = {
+        json: (data: any) => {
+          io.emit('rankingUpdate', data);
+        },
+      } as Response;
+      
+      await this.getAllVideos(videosReq, videosRes, next);
       res.status(200).json({ message: 'Voto realizado com sucesso.' });
     } catch (error) {
       return next(error);
