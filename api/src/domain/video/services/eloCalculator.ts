@@ -1,4 +1,4 @@
-import { OutVideo } from "../models/outVideo/video";
+import { OutVideo } from "../models/output/video";
 
 export class EloCalculator {
     calculateElo(player: OutVideo, opponent: OutVideo, resultado: number[], k: number = 32): number[] {

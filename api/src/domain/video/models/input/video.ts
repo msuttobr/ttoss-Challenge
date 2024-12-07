@@ -1,4 +1,4 @@
-import { OutVideo } from "../outVideo/video";
+import { OutVideo } from "../output/video";
 
 export interface InVideo {
     result: number[];

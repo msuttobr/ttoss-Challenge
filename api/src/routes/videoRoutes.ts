@@ -1,9 +1,9 @@
 import { Router } from 'express';
-import { VideoService } from '../services/videoService';
-import { VideoRepository } from '../repositories/videoRepository';
-import { VideoController } from '../controllers/videoController';
-import { EloCalculator } from '../services/eloCalculator';
-import { IDatabaseClient } from '../interface/database/IDatabaseClient';
+import { VideoService } from '../domain/video/services/videoService';
+import { VideoController } from '../domain/video/controllers/videoController';
+import { EloCalculator } from '../domain/video/services/eloCalculator';
+import { IDatabaseClient } from '../database/interface/IDatabaseClient';
+import { VideoRepository } from '../domain/video/repositories/videoRepository';
 
 const videoRoutes = (dbAdapter: IDatabaseClient) => {
     const videoRepository = new VideoRepository(dbAdapter);

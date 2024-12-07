@@ -1,7 +1,7 @@
 import { VideoRepository } from '../repositories/videoRepository';
-import { InVideo } from '../models/inVideo/video';
-import { OutVideo } from '../models/outVideo/video';
-import { OutVideoBattle } from '../models/outVideo/videoBattle';
+import { InVideo } from '../models/input/video';
+import { OutVideo } from '../models/output/video';
+import { OutVideoBattle } from '../models/output/videoBattle';
 import { IVideoService } from '../interface/service/IVideoService';
 import { EloCalculator } from './eloCalculator';
 

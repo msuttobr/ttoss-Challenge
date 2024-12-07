@@ -1,4 +1,4 @@
-import { ErrorResponse } from '../models/types/errorResponse';
+import { ErrorResponse } from '../types/errorResponse';
 
 export class CustomError extends Error implements ErrorResponse {
     public status?: number;

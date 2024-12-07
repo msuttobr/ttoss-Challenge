@@ -1,5 +1,5 @@
-import { InVideo } from "../../models/inVideo/video";
-import { OutVideo } from "../../models/outVideo/video";
+import { InVideo } from "../../models/input/video";
+import { OutVideo } from "../../models/output/video";
 
 export interface IVideoRepository {
     getAllVideos(): Promise<OutVideo[]>

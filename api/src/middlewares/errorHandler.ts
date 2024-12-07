@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { ErrorResponse } from '../models/types/errorResponse';
+import { ErrorResponse } from '../types/errorResponse';
 import { logStream } from '../app';
 
 const errorHandler = (err: ErrorResponse, req: Request, res: Response, next: NextFunction) => {

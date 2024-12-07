@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from 'express';
 import { VideoService } from '../services/videoService';
-import { InVideo } from '../models/inVideo/video';
-import { io } from '../app';
+import { InVideo } from '../models/input/video';
+import { io } from '../../../app';
 
 export class VideoController {
   constructor(private videoService: VideoService) { }

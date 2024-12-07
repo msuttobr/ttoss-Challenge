@@ -1,6 +1,6 @@
 import { Client } from 'pg';
 import { CustomError } from '../utils/customError';
-import { IDatabaseClient } from '../interface/database/IDatabaseClient';
+import { IDatabaseClient } from './interface/IDatabaseClient';
 
 export class PostgresDatabaseAdapter implements IDatabaseClient {
   private client: Client;

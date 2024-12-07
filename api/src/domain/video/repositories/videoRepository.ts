@@ -1,9 +1,9 @@
-import { IDatabaseClient } from '../interface/database/IDatabaseClient';
-import { IVideoRepository } from '../interface/repository/IVideoRepository';
-import { InVideo } from '../models/inVideo/video';
-import { OutVideo } from '../models/outVideo/video';
-import { CustomError } from '../utils/customError';
-import { shuffle } from '../utils/shuffler';
+import { IDatabaseClient } from '../../../database/interface/IDatabaseClient';
+import { IVideoRepository } from '../../../domain/video/interface/repository/IVideoRepository';
+import { InVideo } from '../models/input/video';
+import { OutVideo } from '../models/output/video';
+import { CustomError } from '../../../utils/customError';
+import { shuffle } from '../../../utils/shuffler';
 
 export class VideoRepository implements IVideoRepository {
     private dbClient: IDatabaseClient;
