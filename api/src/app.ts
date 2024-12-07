@@ -6,8 +6,9 @@ import morgan from 'morgan';
 import dotenv from 'dotenv';
 import http from 'http';
 import { Server as SocketIOServer } from "socket.io";
-import videoRoutes from './routes/videoRoutes';
 import errorHandler from './middlewares/errorHandler';
+import { PostgresDatabaseAdapter } from './database/PostgresDatabaseAdapter';
+import videoRoutes from './routes/videoRoutes';
 
 dotenv.config();
 
@@ -38,26 +39,45 @@ if (nodeEnv === 'development') {
 app.use(cors());
 app.use(express.json());
 
-app.use('/api/videos', videoRoutes);
+const init = async () => {
+    try {
+        const dbAdapter = new PostgresDatabaseAdapter();
+        await dbAdapter.connect();
 
-io.on('connection', (socket) => {
-    console.log('A user connected');
+        app.use('/api/videos', videoRoutes(dbAdapter));
 
-    socket.on('disconnect', () => {
-        console.log('A user disconnected');
-    });
-});
+        io.on('connection', (socket) => {
+            console.log('A user connected');
 
-app.get('/', (req: Request, res: Response) => {
-    res.send('Bem-vindo a API do Melhor Vídeo do YouTube!, Temos WebSocket');
-});
+            socket.on('disconnect', () => {
+                console.log('A user disconnected');
+            });
+        });
 
-app.use(errorHandler);
+        app.get('/', (req: Request, res: Response) => {
+            res.send('Bem-vindo a API do Melhor Vídeo do YouTube!, Temos WebSocket');
+        });
 
-server.listen(port, () => {
-    if (nodeEnv === 'development') {
-        console.log(`Servidor rodando em ambiente de desenvolvimento na porta ${port}`);
-    } else {
-        console.log(`Servidor rodando em produção na porta ${port}`);
+        app.use(errorHandler);
+
+        server.listen(port, () => {
+            if (nodeEnv === 'development') {
+                console.log(`Servidor rodando em ambiente de desenvolvimento na porta ${port}`);
+            } else {
+                console.log(`Servidor rodando em produção na porta ${port}`);
+            }
+        });
+
+        process.on('SIGINT', async () => {
+            console.log('Finalizando o servidor...');
+            await dbAdapter.disconnect();
+            server.close(() => {
+                console.log('Servidor encerrado');
+                process.exit(0);
+            });
+        });
+    } catch (error) {
+        console.error("Erro ao inicializar a aplicação:", error);
     }
-});
+}
+init();

@@ -1,3 +1,4 @@
+import { IDatabaseClient } from '../interface/database/IDatabaseClient';
 import { IVideoRepository } from '../interface/repository/IVideoRepository';
 import { InVideo } from '../models/inVideo/video';
 import { OutVideo } from '../models/outVideo/video';
@@ -5,25 +6,30 @@ import { CustomError } from '../utils/customError';
 import { shuffle } from '../utils/shuffler';
 
 export class VideoRepository implements IVideoRepository {
-    private videos: OutVideo[] = [];
+    private dbClient: IDatabaseClient;
 
-    constructor(videos: OutVideo[] = []) {
-        this.videos = videos.length > 0 ? videos : [
-            { id: '1', title: 'Video 1', url: 'https://www.youtube.com/embed/Ex2NB7JsLyA', rating: 800 },
-            { id: '2', title: 'Video 2', url: 'https://www.youtube.com/embed/8G80nuEyDN4', rating: 800 },
-        ];
+    constructor(dbClient: IDatabaseClient) {
+        this.dbClient = dbClient;
     }
 
     async getAllVideos(): Promise<OutVideo[]> {
-        const videos = this.videos;
-        if (!videos.length) {
-            throw new CustomError(`Não existem videos cadastrados`, 444)
+        const query = 'SELECT * FROM videos';
+        const videos = await this.dbClient.query(query, []);
+
+        if (videos.length === 0) {
+            throw new CustomError(`Não existem vídeos cadastrados`, 444);
         }
-        return videos;
+
+        return videos.map((video: any) => ({
+            id: video.id,
+            title: video.title,
+            url: video.url,
+            rating: video.rating,
+        }));
     }
 
     async getVideosBattle(): Promise<OutVideo[]> {
-        const videos = shuffle<OutVideo>(this.videos).slice(0, 2)
+        const videos = shuffle<OutVideo>(await this.getAllVideos()).slice(0, 2)
         if (videos.length !== 2) {
             throw new CustomError(`É necessário que existam pelo menos 2 videos para competirem`)
         }
@@ -31,11 +37,19 @@ export class VideoRepository implements IVideoRepository {
     }
 
     async getVideoById(id: string): Promise<OutVideo> {
-        const video = this.videos.find(video => video.id === id);
-        if (!video) {
+        const query = 'SELECT * FROM videos WHERE id = $1';
+        const video = await this.dbClient.query(query, [id]);
+
+        if (video.length === 0) {
             throw new CustomError('Vídeo não encontrado.', 204);
         }
-        return video;
+
+        return {
+            id: video[0].id,
+            title: video[0].title,
+            url: video[0].url,
+            rating: video[0].rating,
+        };
     }
 
     async saveVote(inVideo: InVideo): Promise<OutVideo[]> {

@@ -3,16 +3,21 @@ import { VideoService } from '../services/videoService';
 import { VideoRepository } from '../repositories/videoRepository';
 import { VideoController } from '../controllers/videoController';
 import { EloCalculator } from '../services/eloCalculator';
+import { IDatabaseClient } from '../interface/database/IDatabaseClient';
 
-const eloCalculator = new EloCalculator();
-const videoRepository = new VideoRepository();
-const videoService = new VideoService(videoRepository, eloCalculator);
-const videoController = new VideoController(videoService);
+const videoRoutes = (dbAdapter: IDatabaseClient) => {
+    const videoRepository = new VideoRepository(dbAdapter);
+    const eloCalculator = new EloCalculator();
+    const videoService = new VideoService(videoRepository, eloCalculator);
+    const videoController = new VideoController(videoService);
 
-const router = Router();
+    const router = Router();
 
-router.get('/ranking', videoController.getAllVideos.bind(videoController));
-router.get('/battle', videoController.getVideosBattle.bind(videoController));
-router.post('/vote', videoController.voteOnVideo.bind(videoController));
+    router.get('/ranking', videoController.getAllVideos.bind(videoController));
+    router.get('/battle', videoController.getVideosBattle.bind(videoController));
+    router.post('/vote', videoController.voteOnVideo.bind(videoController));
 
-export default router;
+    return router;
+}
+
+export default videoRoutes;
