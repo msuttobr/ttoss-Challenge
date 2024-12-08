@@ -1,4 +1,5 @@
 cd /app/api
+npm run build
 npm run start &
 
 cd /app/ttos
