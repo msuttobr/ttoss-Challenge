@@ -9,6 +9,7 @@ import { Server as SocketIOServer } from "socket.io";
 import errorHandler from './middlewares/errorHandler';
 import { PostgresDatabaseAdapter } from './database/PostgresDatabaseAdapter';
 import videoRoutes from './routes/videoRoutes';
+import validateApiKey from './middlewares/validateApiKey';
 
 dotenv.config();
 
@@ -28,10 +29,11 @@ export const io = new SocketIOServer(server, {
 
 export const logStream = fs.createWriteStream(path.join(__dirname, 'access.log'), { flags: 'a' });
 
+const logConfig = ':date[iso] :remote-addr :method :url :status :res[content-length] - :response-time ms :referrer :user-agent'
 if (nodeEnv === 'development') {
     app.use(morgan('dev'));
 } else {
-    app.use(morgan('common', {
+    app.use(morgan(logConfig, {
         stream: logStream
     }));
 }
@@ -44,7 +46,7 @@ const init = async () => {
         const dbAdapter = new PostgresDatabaseAdapter();
         await dbAdapter.connect();
 
-        app.use('/api/videos', videoRoutes(dbAdapter));
+        app.use('/api/videos', validateApiKey, videoRoutes(dbAdapter));
 
         io.on('connection', (socket) => {
             console.log('A user connected');
