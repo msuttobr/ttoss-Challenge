@@ -14,7 +14,6 @@ COPY api/ .
 
 COPY --from=build-frontend /app/ttos/dist ./public
 
-ENV PORT=5000
 EXPOSE 5000 5173
 
 CMD ["sh", "-c", "npm run start & npx serve public -l 5173"]
