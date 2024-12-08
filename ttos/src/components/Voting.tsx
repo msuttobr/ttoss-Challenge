@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
-import axios from "axios";
+import { useState, useEffect, useCallback } from "react";
+import apiClient from "../services/apiClient";
+import styles from './videoCard.module.css';
 
 type VideoBattle = {
   id: string;
@@ -9,60 +10,70 @@ type VideoBattle = {
   probability: number;
 };
 
+const VideoCard = ({ video, index, onVote }: { video: VideoBattle, index: number, onVote: (index: number) => void }) => (
+  <div className={styles.videoCard}>
+    <div className={styles.content}>
+      <h3 className={styles.h3}>{video.title}</h3>
+      <p>Probabilidade: {(video.probability * 100).toFixed(2)}%</p>
+      <p>Avaliação: {video.rating}</p>
+    </div>
+    <iframe
+      className={styles.iframe}
+      src={`https://www.youtube.com/embed/${video.url}`}
+      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+      referrerPolicy="strict-origin-when-cross-origin"
+      allowFullScreen
+    />
+    <button className={styles.button} onClick={() => onVote(index)}>Escolher</button>
+  </div>
+);
+
 const VotingPage = () => {
   const [videos, setVideos] = useState<VideoBattle[]>([]);
   const [nextBattle, setNextBattle] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  const fetchVideos = async () => {
+  const fetchVideos = useCallback(async () => {
+    setError(null);
     try {
-      const response = (await axios.get<VideoBattle[]>("http://localhost:5000/api/videos/battle")).data;
-      setVideos(response);
-
-    } catch (error) {
-      console.error("Erro ao buscar vídeos", error);
+      const response = await apiClient.get<VideoBattle[]>('battle');
+      setVideos(response.data);
+    } catch (err) {
+      setError("Erro ao buscar vídeos. Tente novamente.");
+      console.error("Erro ao buscar vídeos", err);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchVideos();
-  }, [nextBattle]);
+  }, [nextBattle, fetchVideos]);
 
   const handleVote = async (index: number) => {
     let result = [0, 0];
-
     result[index] = 1;
+
     try {
-      await axios.post("http://localhost:5000/api/videos/vote", {
+      await apiClient.post('vote', {
         result: result,
         videos: videos
       });
-      setNextBattle(!nextBattle)
-    } catch (error) {
-      console.error("Erro ao registrar voto", error);
+      setNextBattle(!nextBattle);
+    } catch (err) {
+      setError("Erro ao registrar voto. Tente novamente.");
+      console.error("Erro ao registrar voto", err);
     }
   };
 
   return (
-    <div>
+    <div className={styles.center}>
       <h1>Vote no Melhor Vídeo</h1>
+      {error && <div style={{ color: "red" }}>{error}</div>}
       {!videos.length ? (
         <p>Carregando vídeos...</p>
       ) : (
-        <div style={{ display: "flex", gap: "20px", justifyContent: "center" }}>
+        <div className={styles.container}>
           {videos.map((video, index) => (
-            <div key={video.id} style={{ display: "flex", flexDirection: "column", gap: "10px", alignItems: "center" }}>
-              <h3>{video.title}</h3>
-              <div>probabilidade: {(video.probability * 100).toFixed(2)}%</div>
-              <div>rating: {video.rating}</div>
-              <iframe
-                width="400"
-                height="300"
-                src={`${video.url}`}
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-                referrerPolicy="strict-origin-when-cross-origin"
-                allowFullScreen></iframe>
-              <button onClick={() => handleVote(index)}>Vencedor</button>
-            </div>
+            <VideoCard key={video.id} video={video} index={index} onVote={handleVote} />
           ))}
         </div>
       )}

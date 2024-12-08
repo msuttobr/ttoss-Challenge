@@ -2,6 +2,7 @@ import { NextFunction, Request, Response } from 'express';
 import { VideoService } from '../services/videoService';
 import { InVideo } from '../models/input/video';
 import { io } from '../../../app';
+import { CustomError } from '../../../utils/customError';
 
 export class VideoController {
   constructor(private videoService: VideoService) { }
@@ -29,10 +30,10 @@ export class VideoController {
       const inVideo: InVideo = req.body;
 
       if (!inVideo.result.length) {
-        return next({ message: 'Resultado de batalha não enviado.', statusCode: 406 });
+        return next(new CustomError('Resultado de batalha não enviado.', 406));
       }
       if (!inVideo.videos.length) {
-        return next({ message: 'Vídeos competidores não enviados.', statusCode: 406 });
+        return next(new CustomError('Vídeos competidores não enviados.', 406));
       }
 
       await this.videoService.voteOnVideo(inVideo);
@@ -43,7 +44,7 @@ export class VideoController {
           io.emit('rankingUpdate', data);
         },
       } as Response;
-      
+
       await this.getAllVideos(videosReq, videosRes, next);
       res.status(200).json({ message: 'Voto realizado com sucesso.' });
     } catch (error) {

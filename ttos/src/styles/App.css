@@ -3,3 +3,16 @@
   padding: 0;
   box-sizing: border-box;
 }
+a {
+  text-decoration: none;
+  color: initial;
+}
+ul {
+  list-style-type: none;
+}
+
+body {
+  background-color: #e1e1e1;
+  font-family: Helvetica;
+  color: #282828;
+}
