@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
-import io from 'socket.io-client';
 import apiClient from "../services/apiClient";
 import styles from "./ranking.module.css";
+import socket from "../services/socket";
 
 type VideoRanking = {
   id: string;
@@ -9,10 +9,6 @@ type VideoRanking = {
   rating: number;
   url: string;
 }
-
-const socket = io('http://localhost:5000', {
-  transports: ['websocket']
-});
 
 function RankingPage() {
   const [videos, setVideos] = useState<VideoRanking[]>([]);
