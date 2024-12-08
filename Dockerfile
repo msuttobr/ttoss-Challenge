@@ -1,19 +1,24 @@
-FROM node:20 AS build-frontend
+FROM node:20
+
+# FRONT
 WORKDIR /app/ttos
+
 COPY ttos/package*.json ./
 RUN npm install
 COPY ttos/ .
-RUN npm run build
 
-FROM node:20
+# BACK
 WORKDIR /app/api
 
 COPY api/package*.json ./
 RUN npm install
 COPY api/ .
 
-COPY --from=build-frontend /app/ttos/dist ./public
+# BASE
+WORKDIR /app
+COPY build-then-run.sh .
+RUN chmod 777 build-then-run.sh
 
 EXPOSE 5000 5173
 
-CMD ["sh", "-c", "npm run start & npx serve public -l 5173"]
+CMD ["sh", "build-then-run.sh"]
