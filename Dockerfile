@@ -19,6 +19,6 @@ WORKDIR /app
 COPY build-then-run.sh .
 RUN chmod 777 build-then-run.sh
 
-EXPOSE 5000 5173
+EXPOSE 5173 5000
 
 CMD ["sh", "build-then-run.sh"]
