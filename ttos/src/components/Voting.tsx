@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import apiClient from "../services/apiClient";
 import styles from './videoCard.module.css';
+import { Link } from "react-router-dom";
 
 type VideoBattle = {
   id: string;
@@ -12,11 +13,6 @@ type VideoBattle = {
 
 const VideoCard = ({ video, index, onVote }: { video: VideoBattle, index: number, onVote: (index: number) => void }) => (
   <div className={styles.videoCard}>
-    <div className={styles.content}>
-      <h3 className={styles.h3}>{video.title}</h3>
-      <p>Probabilidade: {(video.probability * 100).toFixed(2)}%</p>
-      <p>Avaliação: {video.rating}</p>
-    </div>
     <iframe
       className={styles.iframe}
       src={`https://www.youtube.com/embed/${video.url}`}
@@ -24,7 +20,12 @@ const VideoCard = ({ video, index, onVote }: { video: VideoBattle, index: number
       referrerPolicy="strict-origin-when-cross-origin"
       allowFullScreen
     />
-    <button className={styles.button} onClick={() => onVote(index)}>Escolher</button>
+    <div className={styles.content}>
+      <h3 className={styles.h3}>{video.title}</h3>
+      <p>Probabilidade: {(video.probability * 100).toFixed(2)}%</p>
+      <p>Avaliação: {video.rating}</p>
+    </div>
+    <button className={styles.button} onClick={() => onVote(index)}>Votar</button>
   </div>
 );
 
@@ -67,6 +68,7 @@ const VotingPage = () => {
   return (
     <div className={styles.center}>
       <h1>Vote no Melhor Vídeo</h1>
+      <Link to="/ranking" style={{ color: 'red' }}>Clique aqui para ver o Ranking</Link>
       {error && <div style={{ color: "red" }}>{error}</div>}
       {!videos.length ? (
         <p>Carregando vídeos...</p>

@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import apiClient from "../services/apiClient";
 import styles from "./ranking.module.css";
 import socket from "../services/socket";
+import { Link } from "react-router-dom";
 
 type VideoRanking = {
   id: string;
@@ -37,6 +38,7 @@ function RankingPage() {
   return (
     <div className={styles.center}>
       <h1>Classificação dos Vídeos</h1>
+      <Link to="/" style={{ color: 'red' }}>Clique aqui para Participar da Votação</Link>
       {!videos.length ? (
         <p>Carregando vídeos...</p>
       ) : (

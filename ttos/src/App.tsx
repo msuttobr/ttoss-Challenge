@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { HashRouter as Router, Route, Routes } from "react-router-dom";
 import Voting from "./components/Voting";
 import RankingPage from "./components/Ranking";
 import './styles/App.css'
