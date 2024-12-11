@@ -33,7 +33,7 @@ export class VideoService implements IVideoService {
     }
     async voteOnVideo(inVideo: InVideo): Promise<OutVideo[]> {
         const videos = inVideo.videos;
-        [videos[0].rating, videos[1].rating] = this.eloCalculator.calculateElo(videos[0], videos[1], inVideo.result);
+        [videos[0].rating, videos[1].rating] = this.eloCalculator.calculateElo(inVideo);
         
         const [video, video2] = await this.videoRepository.saveVote(inVideo);
 
