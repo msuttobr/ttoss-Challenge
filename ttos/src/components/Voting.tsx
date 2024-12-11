@@ -9,6 +9,7 @@ type VideoBattle = {
   url: string;
   rating: number;
   probability: number;
+  disputedWinLoser: number[];
 };
 
 const VideoCard = ({ video, index, onVote }: { video: VideoBattle, index: number, onVote: (index: number) => void }) => (
@@ -23,7 +24,10 @@ const VideoCard = ({ video, index, onVote }: { video: VideoBattle, index: number
     <div className={styles.content}>
       <h3 className={styles.h3}>{video.title}</h3>
       <p>Probabilidade: {(video.probability * 100).toFixed(2)}%</p>
-      <p>Avaliação: {video.rating}</p>
+      <p>Avaliação: {video.rating}&nbsp;
+        <span style={{ color: "green" }}>+{video.disputedWinLoser[0]}</span>&nbsp;
+        <span style={{ color: "red" }}>-{video.disputedWinLoser[1]}</span>
+      </p>
     </div>
     <button className={styles.button} onClick={() => onVote(index)}>Votar</button>
   </div>

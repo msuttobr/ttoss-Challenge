@@ -18,10 +18,15 @@ export class VideoService implements IVideoService {
     async getVideosBattle(): Promise<OutVideoBattle[]> {
         const videos = await this.videoRepository.getVideosBattle();
         const [probability1, probability2] = this.eloCalculator.calculateExpectative(videos[0], videos[1]);
+        const disputedWin1 = Math.round(this.eloCalculator.calculateDisputed(1, probability1));
+        const disputedWin2 = Math.round(this.eloCalculator.calculateDisputed(1, probability2));
+        const disputedLoser1 = Math.round(this.eloCalculator.calculateDisputed(1, probability1));
+        const disputedLoser2 = Math.round(this.eloCalculator.calculateDisputed(1, probability2));
 
         const videosBattle: OutVideoBattle[] = videos.map((video, index) => ({
             ...video,
             probability: index === 0 ? probability1 : probability2,
+            disputedWinLoser: index === 0 ? [disputedWin1, disputedLoser2] : [disputedWin2, disputedLoser1],
         }));
 
         return videosBattle;

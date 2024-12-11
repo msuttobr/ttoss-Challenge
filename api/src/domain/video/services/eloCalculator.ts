@@ -1,11 +1,11 @@
 import { OutVideo } from "../models/output/video";
 
 export class EloCalculator {
-    calculateElo(player: OutVideo, opponent: OutVideo, resultado: number[], k: number = 32): number[] {
+    calculateElo(player: OutVideo, opponent: OutVideo, resultado: number[]): number[] {
         const [playerExpect, opponentExpect] = this.calculateExpectative(player, opponent)
 
-        const newClassificationPlayer = player.rating + k * (resultado[0] - playerExpect);
-        const newClassificationOpponent = opponent.rating + k * (resultado[1] - opponentExpect);
+        const newClassificationPlayer = player.rating + this.calculateDisputed(resultado[0], playerExpect);
+        const newClassificationOpponent = opponent.rating + this.calculateDisputed(resultado[0], opponentExpect);
 
         return [Math.round(newClassificationPlayer), Math.round(newClassificationOpponent)];
     }
@@ -15,5 +15,9 @@ export class EloCalculator {
         const expectationOpponent = 1 / (1 + Math.pow(10, (player.rating - opponent.rating) / 400));
 
         return [expectationPlayer, expectationOpponent]
+    }
+
+    calculateDisputed(result: number, expect: number, k: number = 32): number {
+        return k * (result - expect)
     }
 }
