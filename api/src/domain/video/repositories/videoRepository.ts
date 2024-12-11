@@ -13,7 +13,7 @@ export class VideoRepository implements IVideoRepository {
     }
 
     async getAllVideos(): Promise<OutVideo[]> {
-        const query = 'SELECT * FROM videos';
+        const query = 'SELECT * FROM videos ORDER BY rating DESC';
         const videos = await this.dbClient.query(query, []);
 
         if (videos.length === 0) {
@@ -58,6 +58,10 @@ export class VideoRepository implements IVideoRepository {
             this.getVideoById(inVideo.videos[1].id)
         ]);
 
-        return [video, video2];
+        const query = 'UPDATE videos SET rating = $1 WHERE id = $2';
+        const newVideo = await this.dbClient.query(query, [inVideo.videos[0].rating, video.id]);
+        const newVideo2 = await this.dbClient.query(query, [inVideo.videos[1].rating, video2.id]);
+
+        return [newVideo, newVideo2];
     }
 }
