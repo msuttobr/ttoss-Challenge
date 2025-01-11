@@ -59,9 +59,9 @@ export class VideoRepository implements IVideoRepository {
         ]);
 
         const query = 'UPDATE videos SET rating = $1 WHERE id = $2';
-        const newVideo = await this.dbClient.query(query, [inVideo.videos[0].rating, video.id]);
-        const newVideo2 = await this.dbClient.query(query, [inVideo.videos[1].rating, video2.id]);
+        await this.dbClient.query(query, [inVideo.videos[0].rating, video.id]);
+        await this.dbClient.query(query, [inVideo.videos[1].rating, video2.id]);
 
-        return [newVideo, newVideo2];
+        return [video, video2];
     }
 }

@@ -12,7 +12,7 @@ export class VideoController {
       const videos = await this.videoService.getAllVideos();
       res.json(videos);
     } catch (error) {
-      return next({ message: 'Erro ao buscar os vídeos.', statusCode: 500 });
+      return next(new CustomError('Erro ao buscar os vídeos.', 500));
     }
   };
 
@@ -21,7 +21,7 @@ export class VideoController {
       const videosBattle = await this.videoService.getVideosBattle();
       res.json(videosBattle);
     } catch (error) {
-      return next({ message: 'Erro ao obter os vídeos para a batalha.', statusCode: 500 });
+      return next(new CustomError('Erro ao obter os vídeos para a batalha.', 500));
     }
   };
 
@@ -37,15 +37,9 @@ export class VideoController {
       }
 
       await this.videoService.voteOnVideo(inVideo);
-
-      const videosReq: Request = {} as Request;
-      const videosRes: Response = {
-        json: (data: any) => {
-          io.emit('rankingUpdate', data);
-        },
-      } as Response;
-
-      await this.getAllVideos(videosReq, videosRes, next);
+      
+      const videos = await this.videoService.getAllVideos()
+      io.emit('rankingUpdate', videos);
       res.status(200).json({ message: 'Voto realizado com sucesso.' });
     } catch (error) {
       return next(error);
